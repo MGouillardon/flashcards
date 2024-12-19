@@ -98,7 +98,7 @@ onUnmounted(() => {
       <div class="max-w-4xl mx-auto">
         <div class="flex flex-col items-center gap-2 mb-8">
           <progress
-            class="progress progress-primary w-full transition-all duration-300 ease-in-out"
+            class="progress progress-primary w-full transition-width duration-300 ease-in-out"
             :value="progress.current"
             :max="progress.total"
           ></progress>
