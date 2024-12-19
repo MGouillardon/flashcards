@@ -1,8 +1,10 @@
 import { HttpContext } from '@adonisjs/core/http'
 import { FlashcardParser } from '#services/flashcard_parser_service'
+import { inject } from '@adonisjs/core'
 
+@inject()
 export default class FlashcardsController {
-  private parser = new FlashcardParser()
+  constructor(protected parser: FlashcardParser) {}
 
   public async index({ inertia }: HttpContext) {
     const decks = await this.parser.listDecks()
