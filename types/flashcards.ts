@@ -7,8 +7,9 @@ export interface Card {
   question: string
   answer: string
   tags: string[]
-  codeBlocks: CodeBlock[]
   section: string
+  questionCodeBlocks: CodeBlock[]
+  answerCodeBlocks: CodeBlock[]
 }
 
 export interface Deck {

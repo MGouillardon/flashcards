@@ -36,7 +36,7 @@ const groupedDecks = computed(() => {
         >
           <div class="card-body">
             <h2 class="card-title capitalize">{{ category }}</h2>
-            <ul class="menu rounded-box">
+            <ul class="menu rounded-box gap-2">
               <li v-for="path in paths" :key="path">
                 <Link :href="`/flashcards/${path}`" class="bg-base-200 hover:bg-base-300">
                   {{ path.split('/')[1].replace('.md', '') }}

@@ -13,7 +13,9 @@ export class FlashcardParser {
     const categories = await readdir(this.basePath)
     const decks: string[] = []
 
-    for (const category of categories) {
+    const validCategories = categories.filter((category) => !category.startsWith('.'))
+
+    for (const category of validCategories) {
       const categoryPath = join(this.basePath, category)
       const files = await readdir(categoryPath)
       decks.push(...files.map((file) => `${category}/${file}`))
@@ -21,7 +23,6 @@ export class FlashcardParser {
 
     return decks
   }
-
   private async readMarkdownFile(category: string, filename: string): Promise<string> {
     const filePath = join(this.basePath, category, filename)
     return readFile(filePath, 'utf-8')
@@ -64,25 +65,28 @@ export class FlashcardParser {
         const answerStart = rest.findIndex((line) => line.startsWith('A:'))
         if (answerStart === -1) return null
 
-        const answerLines = rest.slice(answerStart)
-        const tagsIndex = answerLines.findIndex((line) => line.includes('Tags:'))
-        const answer = answerLines
-          .slice(0, tagsIndex !== -1 ? tagsIndex : undefined)
-          .join('\n')
+        const answerContent = rest.slice(answerStart).join('\n')
+
+        const answerCodeBlocks = this.extractCodeBlocks(answerContent)
+
+        let answer = answerContent
           .replace('A:', '')
+          .replace(/Tags:[\s\S]*$/, '') // Enlever les tags
+          .replace(/```[\s\S]*?```/g, '') // Enlever les blocs de code
+          .replace(/\/\/ Output:[\s\S]*?(?=\n\n|$)/g, '') // Enlever les outputs en texte
           .trim()
 
         return {
           question,
           answer,
           tags: this.extractTags(block),
-          codeBlocks: this.extractCodeBlocks(block),
           section,
+          questionCodeBlocks: this.extractCodeBlocks(rest.slice(0, answerStart).join('\n')),
+          answerCodeBlocks,
         }
       })
       .filter((card): card is Card => card !== null)
   }
-
   private extractTags(content: string): string[] {
     const tagsLine = content.split('\n').find((line) => line.includes('Tags:'))
     if (!tagsLine) return []

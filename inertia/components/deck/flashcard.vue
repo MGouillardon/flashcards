@@ -32,6 +32,14 @@ const onRateClick = (score) => {
     <div class="card-body p-8">
       <div class="mb-6">
         <h3 class="card-title mb-4">{{ card.question }}</h3>
+        <div
+          v-for="(block, index) in card.questionCodeBlocks"
+          :key="`question-${index}`"
+          class="mb-4"
+        >
+          <CodeBlock :code="block.code" :language="block.language" />
+        </div>
+
         <div class="flex flex-wrap gap-2">
           <span v-for="tag in card.tags" :key="tag" class="badge badge-outline">
             {{ tag }}
@@ -39,15 +47,19 @@ const onRateClick = (score) => {
         </div>
       </div>
 
-      <div v-for="(block, index) in card.codeBlocks" :key="index" class="mb-4">
-        <CodeBlock :code="block.code" :language="block.language" />
-      </div>
-
       <div class="divider">Réponse</div>
 
       <div class="min-h-[100px] flex flex-col items-center justify-center" @click="onToggleClick">
         <div v-if="showAnswer" class="w-full">
           <div class="prose max-w-none mb-6" v-html="card.answer" />
+
+          <div
+            v-for="(block, index) in card.answerCodeBlocks"
+            :key="`answer-${index}`"
+            class="mb-4"
+          >
+            <CodeBlock :code="block.code" :language="block.language" />
+          </div>
 
           <div class="flex flex-col items-center gap-4 mt-8">
             <p class="text-base-content/60">Comment évaluez-vous votre compréhension ? (1-5)</p>
