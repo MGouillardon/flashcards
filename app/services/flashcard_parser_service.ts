@@ -52,6 +52,21 @@ export class FlashcardParser {
     })
   }
 
+  private formatListsInAnswer(text: string): string {
+    const listRegex = /(?:^|\n)(\d+\.\s+[^\n]+(?:\n\d+\.\s+[^\n]+)*)/g
+
+    return text.replace(listRegex, (match) => {
+      const items = match
+        .trim()
+        .split(/\n/)
+        .map((item) => item.replace(/^\d+\.\s+/, '').trim())
+        .filter(Boolean)
+
+      const listItems = items.map((item) => `  <li>${item}</li>`).join('\n')
+      return `\n<ol class="list-decimal list-inside space-y-2 my-4">\n${listItems}\n</ol>`
+    })
+  }
+
   private parseCards(content: string, section: string): Card[] {
     const cardBlocks = content.split(/^### /m).filter(Boolean)
 
@@ -71,10 +86,12 @@ export class FlashcardParser {
 
         let answer = answerContent
           .replace('A:', '')
-          .replace(/Tags:[\s\S]*$/, '') // Enlever les tags
-          .replace(/```[\s\S]*?```/g, '') // Enlever les blocs de code
-          .replace(/\/\/ Output:[\s\S]*?(?=\n\n|$)/g, '') // Enlever les outputs en texte
+          .replace(/Tags:[\s\S]*$/, '')
+          .replace(/```[\s\S]*?```/g, '')
+          .replace(/\/\/ Output:[\s\S]*?(?=\n\n|$)/g, '')
           .trim()
+
+        answer = this.formatListsInAnswer(answer)
 
         return {
           question,
